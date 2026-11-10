@@ -123,8 +123,9 @@ async function scrapeSite(c) {
   const out = await Promise.all(picks.map(async (p) => {
     const page = await get(p.url, 60000);
     const meta = page ? ogMeta(page) : {};
-    // og:title often carries a " - Site name" suffix; prefer the link text when it is a prefix of it.
-    const title = meta.title && isThaana(meta.title) && !meta.title.startsWith(p.title) ? meta.title : p.title;
+    // Prefer og:title (link text often carries a category label); drop a trailing " - Site name".
+    const cleaned = cleanTitle(meta.title);
+    const title = cleaned && isThaana(cleaned) ? cleaned : p.title;
     const ts = Date.parse(meta.published || '');
     return {
       channel: c.id, title, summary: meta.description || '', url: p.url,
@@ -133,6 +134,12 @@ async function scrapeSite(c) {
     };
   }));
   return out;
+}
+
+function cleanTitle(t) {
+  if (!t) return '';
+  const m = t.match(/^(.*\S)\s+[-|–—]\s+[^-|–—]+$/);
+  return m && m[1].length >= 12 ? m[1] : t;
 }
 
 function ogMeta(html) {
