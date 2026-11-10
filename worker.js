@@ -135,12 +135,13 @@ async function scrapeSite(c) {
       hint: (meta.section + ' ' + p.url).toLowerCase(), image: meta.image || null,
     };
   }));
-  return out;
+  // A "headline" this long is a whole teaser block, not a title.
+  return out.filter((a) => a.title.length <= 160);
 }
 
 // "... - 2 ގަޑިއިރު ކުރިން" -> minutes ago, or null.
-const REL = /(\d+)\s*(ސިކުންތު|މިނެޓު|މިނިޓު|ގަޑިއިރު|ދުވަސް|ހަފްތާ|މަސް|އަހަރު)\s*ކުރިން/;
-const REL_MIN = { 'ސިކުންތު': 1 / 60, 'މިނެޓު': 1, 'މިނިޓު': 1, 'ގަޑިއިރު': 60, 'ދުވަސް': 1440, 'ހަފްތާ': 10080, 'މަސް': 43200, 'އަހަރު': 525600 };
+const REL = /(\d+)\s*(ސިކުންތު|މިނެޓު|މިނެޓް|މިނިޓު|މިނިޓް|ގަޑިއިރު|ދުވަސް|ހަފްތާ|މަސް|އަހަރު)\s*ކުރިން/;
+const REL_MIN = { 'ސިކުންތު': 1 / 60, 'މިނެޓު': 1, 'މިނެޓް': 1, 'މިނިޓު': 1, 'މިނިޓް': 1, 'ގަޑިއިރު': 60, 'ދުވަސް': 1440, 'ހަފްތާ': 10080, 'މަސް': 43200, 'އަހަރު': 525600 };
 function relTime(t) {
   const m = t.match(REL);
   return m ? Math.round(+m[1] * REL_MIN[m[2]]) : null;
@@ -148,7 +149,7 @@ function relTime(t) {
 // Drop relative-time tails, leftover code and stray arrows/dashes from link text.
 function cleanHeadline(t) {
   return t
-    .replace(/\s*[-–—|·]?\s*\d+\s*(ސިކުންތު|މިނެޓު|މިނިޓު|ގަޑިއިރު|ދުވަސް|ހަފްތާ|މަސް|އަހަރު)\s*ކުރިން.*$/, '')
+    .replace(/\s*[-–—|·]?\s*\d+\s*(ސިކުންތު|މިނެޓު|މިނެޓް|މިނިޓު|މިނިޓް|ގަޑިއިރު|ދުވަސް|ހަފްތާ|މަސް|އަހަރު)\s*ކުރިން.*$/, '')
     .replace(/['"]?\s*\.?\s*\$[A-Za-z_][\s\S]*$/, '') // leaked server template code
     .replace(/(<-+|-+>|<!-+|-+>)/g, ' ')
     .replace(/[\s'".·|–—-]+$/, '')
