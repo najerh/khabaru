@@ -12,7 +12,7 @@ const CHANNELS = [
   { id: 'mihaaru', home: 'https://mihaaru.com' },
   { id: 'sun', home: 'https://sun.mv' },
   { id: 'avas', home: 'https://avas.mv' },
-  { id: 'dhauru', home: 'https://dhauru.com' },
+  { id: 'dhauru', home: 'https://dhauru.com', scrape: true }, // its RSS is romanised; scrape Thaana pages instead
   { id: 'adhadhu', home: 'https://adhadhu.com' },
   { id: 'psm', home: 'https://psmnews.mv' },
   { id: 'raajje', home: 'https://raajje.mv' },
@@ -79,12 +79,85 @@ async function loadAll(env) {
 }
 
 async function loadChannel(c, env) {
-  const feedUrl = c.feed || (await discover(c, env));
-  if (!feedUrl) return { id: c.id, status: 'noFeed', feedUrl: null, articles: [] };
-  const xml = await get(feedUrl);
-  if (!xml) return { id: c.id, status: 'fetchFailed', feedUrl, articles: [] };
-  const articles = parseFeed(xml, c.id);
-  return { id: c.id, status: articles.length ? 'ok' : 'fetchFailed', feedUrl, articles };
+  if (!c.scrape) {
+    const feedUrl = c.feed || (await discover(c, env));
+    if (feedUrl) {
+      const xml = await get(feedUrl);
+      const articles = xml ? parseFeed(xml, c.id) : [];
+      if (articles.length) return { id: c.id, status: 'ok', feedUrl, articles };
+    }
+  }
+  // No usable feed: scrape the homepage for Thaana headlines.
+  const articles = await scrapeSite(c);
+  return { id: c.id, status: articles.length ? 'scraped' : 'noFeed', feedUrl: null, articles };
+}
+
+// --- Generic scraper: homepage links with Thaana text, then og: metadata per article ---
+
+const SCRAPE_MAX = 20;
+
+async function scrapeSite(c) {
+  const html = await get(c.home);
+  if (!html) return [];
+  const host = new URL(c.home).hostname.replace(/^www\./, '');
+  const seen = new Set();
+  const picks = [];
+  for (const m of html.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)) {
+    const href = (m[1].match(/href\s*=\s*["']([^"'#]+)/i) || [])[1];
+    if (!href) continue;
+    const text = strip(m[2]);
+    if (text.length < 12 || !isThaana(text)) continue;
+    let u;
+    try { u = new URL(href, c.home); } catch { continue; }
+    if (u.hostname.replace(/^www\./, '') !== host) continue;
+    const path = u.pathname;
+    // Article pages have an id or a long slug; category pages don't.
+    if (!/\d{3,}/.test(path) && path.length < 25) continue;
+    u.search = ''; u.hash = '';
+    const key = u.toString();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    picks.push({ url: key, title: text });
+    if (picks.length >= SCRAPE_MAX) break;
+  }
+  const out = await Promise.all(picks.map(async (p) => {
+    const page = await get(p.url, 60000);
+    const meta = page ? ogMeta(page) : {};
+    // og:title often carries a " - Site name" suffix; prefer the link text when it is a prefix of it.
+    const title = meta.title && isThaana(meta.title) && !meta.title.startsWith(p.title) ? meta.title : p.title;
+    const ts = Date.parse(meta.published || '');
+    return {
+      channel: c.id, title, summary: meta.description || '', url: p.url,
+      published: Number.isNaN(ts) ? new Date().toISOString() : new Date(ts).toISOString(),
+      hint: (meta.section + ' ' + p.url).toLowerCase(), image: meta.image || null,
+    };
+  }));
+  return out;
+}
+
+function ogMeta(html) {
+  const head = html.slice(0, 60000);
+  const pick = (names) => {
+    for (const n of names) {
+      const re = new RegExp('<meta\\b[^>]*(?:property|name)\\s*=\\s*["\']' + n.replace(/[.:]/g, '\\$&') + '["\'][^>]*content\\s*=\\s*["\']([^"\']*)["\']', 'i');
+      const re2 = new RegExp('<meta\\b[^>]*content\\s*=\\s*["\']([^"\']*)["\'][^>]*(?:property|name)\\s*=\\s*["\']' + n.replace(/[.:]/g, '\\$&') + '["\']', 'i');
+      const m = head.match(re) || head.match(re2);
+      if (m && m[1]) return strip(m[1]);
+    }
+    return '';
+  };
+  let published = pick(['article:published_time', 'og:article:published_time', 'datePublished', 'pubdate', 'publish-date', 'date']);
+  if (!published) {
+    const ld = head.match(/"datePublished"\s*:\s*"([^"]+)"/);
+    if (ld) published = ld[1];
+  }
+  return {
+    title: pick(['og:title', 'twitter:title']),
+    description: pick(['og:description', 'description', 'twitter:description']).slice(0, 400),
+    image: pick(['og:image', 'og:image:url', 'twitter:image']),
+    published,
+    section: pick(['article:section']),
+  };
 }
 
 // Feed discovery, remembered in KV when bound (wrangler.toml), else per request.

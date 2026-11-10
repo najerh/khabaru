@@ -198,7 +198,7 @@ function viewFeed(){
   for(var i=1;i<l.length;i++)h+=compactCard(l[i],true);
   return h;}
 function count(m){return Object.keys(m).filter(function(k){return m[k]&&byId(k);}).length;}
-function statusText(id){var s=data.status[id];return s==='ok'?'ފީޑު ލިބޭ':s==='noFeed'?'ފީޑެއް ނުފެނުނު':s==='fetchFailed'?'ފީޑު ނުގެނެވުނު':'ބަލަނީ...';}
+function statusText(id){var s=data.status[id];return s==='ok'?'ފީޑު ލިބޭ':s==='scraped'?'ވެބްސައިޓުން':s==='noFeed'?'ފީޑެއް ނުފެނުނު':s==='fetchFailed'?'ފީޑު ނުގެނެވުނު':'ބަލަނީ...';}
 function viewFollowing(){
   var chev='<svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#98989F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3L5 8l5 5"/></svg>';
   var h=mast('ފޮލޯކުރާ')+'<div style="height:20px"></div><div class="group">'+
