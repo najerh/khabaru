@@ -131,6 +131,7 @@ function parseFeed(xml, channelId) {
     const title = strip(tag(it, 'title'));
     const link = linkOf(it);
     if (!title || !link) continue;
+    if (!isThaana(title)) continue; // Dhivehi only: drop English and romanised items
     const rawDesc = tag(it, 'description') || tag(it, 'summary') || tag(it, 'content:encoded') || tag(it, 'content') || '';
     const cats = [...it.matchAll(/<category\b([^>]*)>([\s\S]*?)<\/category>|<category\b[^>]*term\s*=\s*["']([^"']+)["'][^>]*\/>/gi)]
       .map((m) => (m[3] || m[2] || '').trim()).join(' ');
@@ -177,6 +178,17 @@ function imageOf(it, rawDesc) {
   }
   const m = rawDesc.match(/<img[^>]+src=["']([^"']+)["']/i);
   return m ? m[1] : null;
+}
+
+// True when most letters in the text are Thaana (U+0780-U+07B1).
+function isThaana(text) {
+  let th = 0, latin = 0;
+  for (const ch of text) {
+    const c = ch.codePointAt(0);
+    if (c >= 0x0780 && c <= 0x07b1) th++;
+    else if ((c >= 0x41 && c <= 0x5a) || (c >= 0x61 && c <= 0x7a)) latin++;
+  }
+  return th > 0 && th >= latin * 2;
 }
 
 function strip(s) {
