@@ -105,7 +105,8 @@ async function scrapeSite(c) {
   for (const m of html.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)) {
     const href = (m[1].match(/href\s*=\s*["']([^"'#]+)/i) || [])[1];
     if (!href) continue;
-    const text = strip(m[2]);
+    const rel = relTime(strip(m[2]));
+    const text = cleanHeadline(strip(m[2]));
     if (text.length < 12 || !isThaana(text)) continue;
     let u;
     try { u = new URL(href, c.home); } catch { continue; }
@@ -117,7 +118,7 @@ async function scrapeSite(c) {
     const key = u.toString();
     if (seen.has(key)) continue;
     seen.add(key);
-    picks.push({ url: key, title: text });
+    picks.push({ url: key, title: text, rel });
     if (picks.length >= SCRAPE_MAX) break;
   }
   const out = await Promise.all(picks.map(async (p) => {
@@ -126,14 +127,33 @@ async function scrapeSite(c) {
     // Prefer og:title (link text often carries a category label); drop a trailing " - Site name".
     const cleaned = cleanTitle(meta.title);
     const title = cleaned && isThaana(cleaned) ? cleaned : p.title;
-    const ts = Date.parse(meta.published || '');
+    let ts = Date.parse(meta.published || '');
+    if (Number.isNaN(ts) && p.rel != null) ts = Date.now() - p.rel * 60000;
     return {
-      channel: c.id, title, summary: meta.description || '', url: p.url,
+      channel: c.id, title: cleanHeadline(title), summary: meta.description || '', url: p.url,
       published: Number.isNaN(ts) ? new Date().toISOString() : new Date(ts).toISOString(),
       hint: (meta.section + ' ' + p.url).toLowerCase(), image: meta.image || null,
     };
   }));
   return out;
+}
+
+// "... - 2 ގަޑިއިރު ކުރިން" -> minutes ago, or null.
+const REL = /(\d+)\s*(ސިކުންތު|މިނެޓު|މިނިޓު|ގަޑިއިރު|ދުވަސް|ހަފްތާ|މަސް|އަހަރު)\s*ކުރިން/;
+const REL_MIN = { 'ސިކުންތު': 1 / 60, 'މިނެޓު': 1, 'މިނިޓު': 1, 'ގަޑިއިރު': 60, 'ދުވަސް': 1440, 'ހަފްތާ': 10080, 'މަސް': 43200, 'އަހަރު': 525600 };
+function relTime(t) {
+  const m = t.match(REL);
+  return m ? Math.round(+m[1] * REL_MIN[m[2]]) : null;
+}
+// Drop relative-time tails, leftover code and stray arrows/dashes from link text.
+function cleanHeadline(t) {
+  return t
+    .replace(/\s*[-–—|·]?\s*\d+\s*(ސިކުންތު|މިނެޓު|މިނިޓު|ގަޑިއިރު|ދުވަސް|ހަފްތާ|މަސް|އަހަރު)\s*ކުރިން.*$/, '')
+    .replace(/['"]?\s*\.?\s*\$[A-Za-z_][\s\S]*$/, '') // leaked server template code
+    .replace(/(<-+|-+>|<!-+|-+>)/g, ' ')
+    .replace(/[\s'".·|–—-]+$/, '')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 function cleanTitle(t) {
@@ -313,6 +333,7 @@ function isThaana(text) {
 
 function strip(s) {
   return s
+    .replace(/<!--[\s\S]*?-->/g, ' ') // comments first: they may contain ">"
     .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1')
     .replace(/<[^>]*>/g, ' ')
     .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>')
