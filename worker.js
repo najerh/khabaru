@@ -19,10 +19,25 @@ const CHANNELS = [
   { id: 'vaguthu', home: 'https://vaguthu.mv' },
   { id: 'thepress', home: 'https://thepress.mv' },
   { id: 'dhen', home: 'https://dhen.mv' },
+  { id: 'vnews', home: 'https://vnews.mv' },
+  { id: 'dhiyares', home: 'https://dhiyares.com' },
+  { id: 'adhives', home: 'https://adhives.mv' },
+  { id: 'hoara', home: 'https://hoara.mv' },
+  { id: 'mmtv', home: 'https://mmtv.mv' },
+  { id: 'dhuvas', home: 'https://dhuvas.mv' },
+  { id: 'cnm', home: 'https://cnm.mv' },
+  { id: 'oneonline', home: 'https://oneonline.mv' },
+  { id: 'hama', home: 'https://hama.mv' },
+  { id: 'voice', home: 'https://voice.mv' },
   // Known feed address? Add feed: 'https://.../rss' and discovery is skipped.
 ];
 
-const CANDIDATE_PATHS = ['/rss', '/feed', '/rss.xml', '/feed.xml', '/atom.xml', '/feeds', '/rss/latest', '/api/rss', '/feed/rss', '/dv/rss', '/dv/feed'];
+const CANDIDATE_PATHS = [
+  '/rss', '/feed', '/feed/', '/rss.xml', '/feed.xml', '/atom.xml', '/index.xml', '/feeds', '/rss/latest', '/rss/all',
+  '/api/rss', '/feed/rss', '/?feed=rss2', '/?feed=atom', '/news/feed', '/category/news/feed', '/dv/rss', '/dv/feed', '/dv/feed/',
+  // Google News sitemaps: headlines + times, published by sites that have no RSS.
+  '/news-sitemap.xml', '/sitemap-news.xml', '/news_sitemap.xml', '/sitemap/news.xml', '/googlenews.xml',
+];
 const CACHE_SECONDS = 300;
 const UA = 'Khabaru/0.1 (+news reader)';
 
@@ -104,7 +119,11 @@ async function discover(c, env) {
 
 async function isFeed(u) {
   const t = await get(u, 4000);
-  return !!t && /<(rss|feed|rdf:RDF)\b/.test(t.trimStart());
+  if (!t) return false;
+  const head = t.trimStart();
+  if (/<(rss|feed|rdf:RDF)\b/.test(head)) return true;
+  // A news sitemap counts only if it carries headlines.
+  return /<urlset\b/.test(head) && /<news:news>|<news:title>/.test(t);
 }
 
 async function get(u, maxChars) {
@@ -124,6 +143,7 @@ async function get(u, maxChars) {
 // --- RSS / Atom parsing with regex (Workers have no DOMParser) ---
 
 function parseFeed(xml, channelId) {
+  if (/<urlset\b/.test(xml) && /<news:title>/.test(xml)) return parseNewsSitemap(xml, channelId);
   let items = [...xml.matchAll(/<item\b[\s\S]*?<\/item>/gi)].map((m) => m[0]);
   if (!items.length) items = [...xml.matchAll(/<entry\b[\s\S]*?<\/entry>/gi)].map((m) => m[0]);
   const out = [];
@@ -148,6 +168,26 @@ function parseFeed(xml, channelId) {
     });
   }
   return out;
+}
+
+// Google News sitemap: <url><loc/><news:news><news:title/><news:publication_date/></news:news><image:image><image:loc/></image:image></url>
+function parseNewsSitemap(xml, channelId) {
+  const out = [];
+  for (const m of xml.matchAll(/<url>([\s\S]*?)<\/url>/gi)) {
+    const u = m[1];
+    const link = tag(u, 'loc');
+    const title = strip(tag(u, 'news:title'));
+    if (!link || !title || !isThaana(title)) continue;
+    const ts = Date.parse(tag(u, 'news:publication_date') || tag(u, 'lastmod'));
+    const img = (u.match(/<image:loc>([\s\S]*?)<\/image:loc>/i) || [])[1];
+    const kw = tag(u, 'news:keywords');
+    out.push({
+      channel: channelId, title, summary: '', url: link.trim(),
+      published: Number.isNaN(ts) ? new Date().toISOString() : new Date(ts).toISOString(),
+      hint: (kw + ' ' + link).toLowerCase(), image: img ? img.trim() : null,
+    });
+  }
+  return out.slice(0, 60);
 }
 
 function tag(s, name) {
