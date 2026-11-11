@@ -269,28 +269,28 @@ function freshStrip(a){return isFresh(a)?'<div class="fresh">ދެންމެ</div>'
 function morePill(s){return s.src.length>1?cov(s):'އިތުރު '+secName(s.sec)+' ޚަބަރު';}
 function leadCard(s){var a=s.src[0];
   return'<button class="card" data-act="story" data-id="'+esc(s.id)+'">'+pic(s,'ph43')+freshStrip(a)+
-  '<div class="pad"><div class="chn">'+chName(a.channel)+'</div>'+
+  '<div class="pad">'+chLine(a.channel)+''+
   '<div class="hl" style="font-size:22px">'+esc(a.title)+'</div>'+
   '<div class="foot"><span class="pill">'+morePill(s)+'</span>'+DOTS+'</div></div></button>';}
 function leadMore(s){var a=s.src[0];
   var h='<div class="card"><button class="cardbtn" data-act="story" data-id="'+esc(s.id)+'">'+pic(s,'ph43')+freshStrip(a)+
-  '<div class="pad"><div class="chn">'+chName(a.channel)+'</div>'+
+  '<div class="pad">'+chLine(a.channel)+''+
   '<div class="hl" style="font-size:22px">'+esc(a.title)+'</div>'+
   '<div class="foot"><span class="meta">'+timeAgo(a.published)+'</span>'+DOTS+'</div></div></button>';
   if(s.src.length>1){h+='<div class="more"><h3>އިތުރު ކަވަރޭޖް</h3>'+s.src.slice(1,4).map(function(x,j){return'<a class="mrow" href="'+esc(x.url)+'" target="_blank" rel="noopener">'+badge(x.channel,36)+'<span class="t">'+esc(x.title)+'</span></a>';}).join('')+'</div>';}
   return h+'</div>';}
 function gridCard(s){var a=s.src[0];
   return'<button class="card" data-act="story" data-id="'+esc(s.id)+'">'+pic(s,'ph43')+
-  '<div class="pad"><div class="chn">'+chName(a.channel)+'</div>'+
+  '<div class="pad">'+chLine(a.channel)+''+
   '<div class="hl" style="font-size:19px">'+esc(a.title)+'</div>'+
   '<div class="foot" style="margin-top:auto;padding-top:12px"><span class="meta">'+timeAgo(a.published)+'</span>'+DOTS+'</div></div></button>';}
 function compactCard(s,strip,pill){var a=s.src[0];
   return'<button class="card" data-act="story" data-id="'+esc(s.id)+'">'+(strip?'<div class="strip">'+secName(s.sec)+'</div>':'')+'<div class="pad" style="padding-top:14px">'+
-  '<div class="row"><div class="grow"><div class="chn">'+chName(a.channel)+'</div>'+
+  '<div class="row"><div class="grow">'+chLine(a.channel)+''+
   '<div class="hl" style="font-size:19px">'+esc(a.title)+'</div></div>'+pic(s,'phsq')+'</div>'+
   '<div class="foot">'+(pill||s.src.length>1?'<span class="pill">'+morePill(s)+'</span>':'<span class="meta">'+timeAgo(a.published)+'</span>')+DOTS+'</div></div></button>';}
 function trendRow(s,i){var a=s.src[0],cols=['#F09440','#EE7B50','#EC5F5C','#E9496B','#E63F7A'];
-  return'<button class="trow" data-act="story" data-id="'+esc(s.id)+'"><span class="rank" style="background:'+cols[i%cols.length]+'">'+(i+1)+'</span><div class="grow"><div class="chn">'+chName(a.channel)+'</div><div class="hl" style="font-size:19px">'+esc(a.title)+'</div><div class="foot" style="margin-top:4px"><span class="meta">'+timeAgo(a.published)+' · '+cov(s)+'</span>'+DOTS+'</div></div></button>';}
+  return'<button class="trow" data-act="story" data-id="'+esc(s.id)+'"><span class="rank" style="background:'+cols[i%cols.length]+'">'+(i+1)+'</span><div class="grow">'+chLine(a.channel)+'<div class="hl" style="font-size:19px">'+esc(a.title)+'</div><div class="foot" style="margin-top:4px"><span class="meta">'+timeAgo(a.published)+' · '+cov(s)+'</span>'+DOTS+'</div></div></button>';}
 function mast(sub,cta){return'<div class="masthead"><div><h1 class="mast m1">ޚަބަރު</h1><div class="mast m2">'+sub+'</div></div>'+(cta||'')+'</div>';}
 function banner(){
   if(data.loading)return'<div class="note">ޚަބަރު ގެންނަނީ...</div>';
@@ -303,7 +303,7 @@ function isWide(){return !!(mq&&mq.matches);}
 function g3(html){return'<div class="g3">'+html+'</div>';}
 function leadMeta(s){var a=s.src[0];
   return'<button class="card" data-act="story" data-id="'+esc(s.id)+'">'+pic(s,'ph43')+freshStrip(a)+
-  '<div class="pad"><div class="chn">'+chName(a.channel)+'</div>'+
+  '<div class="pad">'+chLine(a.channel)+''+
   '<div class="hl" style="font-size:22px">'+esc(a.title)+'</div>'+
   '<div class="foot">'+(s.src.length>1?'<span class="pill">'+cov(s)+'</span>':'<span class="meta">'+timeAgo(a.published)+'</span>')+DOTS+'</div></div></button>';}
 function sideHtml(){

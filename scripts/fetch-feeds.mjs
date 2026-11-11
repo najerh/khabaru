@@ -14,7 +14,7 @@ const prev = new Map();
 const prevLogo = new Map();
 try {
   const old = JSON.parse(fs.readFileSync('docs/feeds.json', 'utf8'));
-  for (const a of old.articles) if (a.body || a.tried) prev.set(a.url, a);
+  for (const a of old.articles) if (a.body || a.tried2) prev.set(a.url, a);
   for (const c of old.channels) if (c.logo) prevLogo.set(c.id, c.logo);
 } catch {}
 
@@ -40,7 +40,7 @@ const todo = [];
 for (const a of data.articles) {
   if (a.body) continue;
   const old = prev.get(a.url);
-  if (old && !!old.full === fullText.has(a.channel)) { a.body = old.body || ''; a.full = !!old.full; if (old.tried) a.tried = 1; if (!a.image && old.image) a.image = old.image; continue; }
+  if (old && !!old.full === fullText.has(a.channel)) { a.body = old.body || ''; a.full = !!old.full; if (old.tried2) a.tried2 = 1; if (!a.image && old.image) a.image = old.image; continue; }
   todo.push(a);
 }
 const MAX_NEW = 80; // per run, to stay gentle on the publishers
@@ -51,7 +51,7 @@ await Promise.all(Array.from({ length: 6 }, async () => {
     const a = queue.shift();
     if (!a) return;
     const html = await get(a.url);
-    a.tried = 1; // remember, so pages with no readable text are not refetched every run
+    a.tried2 = 1; // remember, so pages with no readable text are not refetched every run
     if (!html) continue;
     const paras = extractBody(html);
     const full = fullText.has(a.channel);

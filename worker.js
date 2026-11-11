@@ -184,6 +184,20 @@ function extractBody(html) {
     const t = strip(m[1]);
     if (t.length >= 40 && isThaana(t)) out.push(t);
   }
+  if (out.length) return out;
+  // Pages built in the browser: the text is often in the page's structured data instead.
+  const ld = html.match(/"articleBody"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+  if (ld) {
+    let t = ld[1];
+    try { t = JSON.parse('"' + t + '"'); } catch {}
+    const ps = htmlToParas(t.replace(/\r?\n+/g, '</p>')).filter((x) => x.length >= 40 && isThaana(x));
+    if (ps.length) return ps;
+  }
+  // Last resort: any long Thaana text blocks in divs.
+  for (const m of h.matchAll(/<div\b[^>]*>([^<]{120,})<\/div>/gi)) {
+    const t = strip(m[1]);
+    if (isThaana(t)) out.push(t);
+  }
   return out;
 }
 
