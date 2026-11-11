@@ -195,6 +195,19 @@ nav button svg{width:24px;height:24px}
 @media (min-width:1280px){.g3 .phsq{width:110px;height:110px;border-radius:10px}.g3 .card .hl{font-size:17px!important}.g3 .card .ph43~.pad .hl{font-size:20px!important}#app{padding-inline:40px}}
 .trow .meta{white-space:normal}
 .trow .foot{align-items:flex-start;gap:8px}
+/* ---- Clean variant: upright sans Thaana (add ?font=clean to the address) ---- */
+@font-face{font-family:'Noto Thaana';src:url('fonts/NotoSansThaana-400.woff2') format('woff2');font-weight:400;font-display:swap;size-adjust:140%;ascent-override:72%;descent-override:34%;line-gap-override:0%}
+@font-face{font-family:'Noto Thaana';src:url('fonts/NotoSansThaana-700.woff2') format('woff2');font-weight:700;font-display:swap;size-adjust:140%;ascent-override:72%;descent-override:34%;line-gap-override:0%}
+@font-face{font-family:'Noto Thaana';src:url('fonts/NotoSansThaana-800.woff2') format('woff2');font-weight:800;font-display:swap;size-adjust:140%;ascent-override:72%;descent-override:34%;line-gap-override:0%}
+html.clean{--f-mast:'Noto Thaana',-apple-system,'Helvetica Neue',Arial,sans-serif;--f-head:var(--f-mast);--f-ui:var(--f-mast);--f-body:var(--f-mast)}
+html.clean .mast{font-weight:800;letter-spacing:-.01em}
+html.clean .hl{-webkit-text-stroke:0;font-weight:700;line-height:1.7;word-spacing:0}
+html.clean .chn{-webkit-text-stroke:0;font-weight:700;word-spacing:0}
+html.clean .body{word-spacing:0;line-height:2}
+html.clean .m1,html.clean .m2{line-height:1.45}
+html.clean h2.mast{line-height:1.6}
+html.clean .ftile,html.clean .tile,html.clean .rank{font-weight:700}
+html.clean .cta,html.clean .wide,html.clean .s-item.on{font-weight:700}
 </style>
 </head>
 <body>
@@ -248,6 +261,7 @@ var SAMPLE=[
 {channel:'mihaaru',key:'school',hint:'educat',published:ago(480),title:'ސްކޫލްތަކުގެ އައު ދިރާސީ އަހަރު ފަށައިފި',summary:'މިއީ ނަމޫނާ ލިޔުމެކެވެ.',url:'https://example.com/9'},
 {channel:'sun',key:'school',hint:'educat',published:ago(540),title:'އައު ދިރާސީ އަހަރަށް ސްކޫލްތައް ހުޅުވައިފި',summary:'މިއީ ނަމޫނާ ލިޔުމެކެވެ.',url:'https://example.com/10'}];
 
+try{if(typeof location!=='undefined'&&/[?&]font=clean/.test(location.search))document.documentElement.classList.add('clean');}catch(e){}
 var KEY='khabaru-live-v1';
 var st={tab:'feed',stack:[],query:'',liked:{},saved:{},read:{},unfollowed:{},comments:{}};
 var data={articles:[],stories:[],status:{},loading:true,error:'',sample:false,fetchedAt:null};
