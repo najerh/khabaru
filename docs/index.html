@@ -278,6 +278,12 @@ h2.mast{margin-top:22px}
 html.clean .hl{font-weight:700}html.clean .chn{font-weight:700;color:var(--text)}html.clean .pill{font-weight:700}
 /* Coverage pill: its text has almost nothing below the baseline, so centre on the ink, not the line box */
 .pill{display:inline-flex;align-items:center;line-height:1!important;padding-top:2px;box-sizing:border-box}
+/* smaller time and coverage text */
+.meta{font-size:11px}
+.pill{font-size:10.5px!important;height:22px;border-radius:11px;padding:2px 9px 0}
+.foot{min-height:22px}.dots{height:22px}
+.trow .meta,.cov .meta{font-size:11px}
+@media (min-width:520px){.pill{height:20px;border-radius:10px;font-size:10px!important}.foot{min-height:20px}.dots{height:20px}.meta{font-size:10.5px}}
 </style>
 </head>
 <body>
