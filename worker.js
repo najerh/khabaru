@@ -122,8 +122,9 @@ async function scrapeSite(c) {
     if (picks.length >= SCRAPE_MAX) break;
   }
   const out = await Promise.all(picks.map(async (p) => {
-    const page = await get(p.url, 60000);
+    const page = await get(p.url);
     const meta = page ? ogMeta(page) : {};
+    const paras = page ? extractBody(page) : [];
     // Prefer og:title (link text often carries a category label); drop a trailing " - Site name".
     const cleaned = cleanTitle(meta.title);
     const title = cleaned && isThaana(cleaned) ? cleaned : p.title;
@@ -131,6 +132,7 @@ async function scrapeSite(c) {
     if (Number.isNaN(ts) && p.rel != null) ts = Date.now() - p.rel * 60000;
     return {
       channel: c.id, title: cleanHeadline(title), summary: meta.description || '', url: p.url,
+      body: clip(paras, c.fullText ? FULL_MAX : EXCERPT_MAX), full: !!c.fullText && paras.length > 0,
       published: Number.isNaN(ts) ? new Date().toISOString() : new Date(ts).toISOString(),
       hint: (meta.section + ' ' + p.url).toLowerCase(), image: meta.image || null,
     };
@@ -155,6 +157,46 @@ function cleanHeadline(t) {
     .replace(/[\s'".·|–—-]+$/, '')
     .replace(/\s+/g, ' ')
     .trim();
+}
+
+// --- Article text ---
+// Default: opening paragraphs only. Set fullText: true on a channel in CHANNELS
+// once that publisher has agreed to full articles being shown.
+const EXCERPT_MAX = 700;
+const FULL_MAX = 8000;
+
+function htmlToParas(html) {
+  if (!html) return [];
+  return html
+    .replace(/<(script|style|figure|iframe|noscript)\b[\s\S]*?<\/\1>/gi, ' ')
+    .split(/<\/p>|<br\s*\/?>\s*<br\s*\/?>|<\/div>|<\/h[1-6]>/i)
+    .map((x) => strip(x))
+    .filter((x) => x.length > 0);
+}
+
+// Thaana paragraphs of an article page, preferring the <article> element.
+function extractBody(html) {
+  let h = html.replace(/<(script|style|noscript|iframe)\b[\s\S]*?<\/\1>/gi, ' ');
+  const art = h.match(/<article\b[\s\S]*?<\/article>/i);
+  if (art && art[0].length > 500) h = art[0];
+  const out = [];
+  for (const m of h.matchAll(/<p\b[^>]*>([\s\S]*?)<\/p>/gi)) {
+    const t = strip(m[1]);
+    if (t.length >= 40 && isThaana(t)) out.push(t);
+  }
+  return out;
+}
+
+// Join paragraphs up to max characters, cutting at a paragraph where possible.
+function clip(paras, max) {
+  let out = '';
+  for (const p of paras) {
+    if (out && out.length + p.length > max) break;
+    out += (out ? '\n\n' : '') + p;
+    if (out.length >= max) break;
+  }
+  if (out.length > max) out = out.slice(0, max).replace(/\s+\S*$/, '') + '…';
+  return out;
 }
 
 function cleanTitle(t) {
@@ -258,9 +300,14 @@ function parseFeed(xml, channelId) {
       .map((m) => (m[3] || m[2] || '').trim()).join(' ');
     const date = tag(it, 'pubDate') || tag(it, 'published') || tag(it, 'updated') || tag(it, 'dc:date');
     const ts = Date.parse(date);
+    const fullHtml = tag(it, 'content:encoded') || tag(it, 'content') || '';
+    const feedParas = htmlToParas(fullHtml);
+    const feedFull = feedParas.join('').length > 600; // the publisher put the article in its feed
     out.push({
       channel: channelId,
       title,
+      body: feedFull ? clip(feedParas, FULL_MAX) : '',
+      full: feedFull,
       summary: strip(rawDesc).slice(0, 400),
       url: link,
       published: Number.isNaN(ts) ? new Date().toISOString() : new Date(ts).toISOString(),
@@ -283,7 +330,7 @@ function parseNewsSitemap(xml, channelId) {
     const img = (u.match(/<image:loc>([\s\S]*?)<\/image:loc>/i) || [])[1];
     const kw = tag(u, 'news:keywords');
     out.push({
-      channel: channelId, title, summary: '', url: link.trim(),
+      channel: channelId, title, body: '', full: false, summary: '', url: link.trim(),
       published: Number.isNaN(ts) ? new Date().toISOString() : new Date(ts).toISOString(),
       hint: (kw + ' ' + link).toLowerCase(), image: img ? img.trim() : null,
     });

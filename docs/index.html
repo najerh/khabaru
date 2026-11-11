@@ -68,7 +68,7 @@ h2.mast{font-size:28px;margin:34px 0 10px;line-height:1.3}
 .grid2 .pad{flex:1 1 auto;display:flex;flex-direction:column}
 .more{margin:0 14px;padding:10px 0 6px;border-top:1px solid var(--line)}
 .more h3{margin:0 0 4px;font-family:var(--f-ui);font-size:17px;font-weight:700}
-.mrow{display:flex;align-items:center;gap:12px;width:100%;min-height:52px;padding:6px 0;text-align:right}
+.mrow{color:inherit;text-decoration:none;display:flex;align-items:center;gap:12px;width:100%;min-height:52px;padding:6px 0;text-align:right}
 .mrow span.t{font-size:16px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .badge{flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;line-height:1}
 .promo{display:flex;align-items:stretch;width:100%;height:56px;border-radius:14px;overflow:hidden;background:var(--card);margin:12px 0 0;text-align:right}
@@ -100,7 +100,11 @@ input::placeholder{color:var(--muted)}
 .tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .tile{position:relative;height:98px;display:flex;align-items:flex-end;padding:8px 12px;border-radius:14px;color:#fff;font-family:var(--f-head);font-weight:700;font-size:18px;line-height:1.5;overflow:hidden}
 .tile svg{position:absolute;inset-inline-end:-6px;bottom:-10px;opacity:.28}
-.body{font-family:var(--f-body);font-size:18px;line-height:2.1;color:var(--soft);margin:16px 0}
+.body{font-family:var(--f-body);font-size:19px;line-height:2.1;color:var(--text);margin:14px 0}
+.readon{display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:6px 16px;border-radius:26px;background:var(--accent);color:#fff;font-size:17px;text-decoration:none;margin:18px 0 6px;text-align:center}
+.srclink{display:inline-flex;align-items:center;gap:6px;min-height:44px;color:var(--accent);font-size:15px;text-decoration:none}
+.cov{color:inherit;text-decoration:none;padding:10px 0}
+.cov .t{font-size:16px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .bar{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 .like{display:flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:22px;background:var(--raised);color:var(--text);font-size:15px}
 .like.on{background:var(--accent);color:#fff}
@@ -270,7 +274,7 @@ function leadMore(s){var a=s.src[0];
   '<div class="pad"><div class="chn">'+chName(a.channel)+'</div>'+
   '<div class="hl" style="font-size:22px">'+esc(a.title)+'</div>'+
   '<div class="foot"><span class="meta">'+timeAgo(a.published)+'</span>'+DOTS+'</div></div></button>';
-  if(s.src.length>1){h+='<div class="more"><h3>އިތުރު ކަވަރޭޖް</h3>'+s.src.slice(1,4).map(function(x,j){return'<button class="mrow" data-act="article" data-id="'+esc(s.id)+'" data-i="'+(j+1)+'">'+badge(x.channel,36)+'<span class="t">'+esc(x.title)+'</span></button>';}).join('')+'</div>';}
+  if(s.src.length>1){h+='<div class="more"><h3>އިތުރު ކަވަރޭޖް</h3>'+s.src.slice(1,4).map(function(x,j){return'<a class="mrow" href="'+esc(x.url)+'" target="_blank" rel="noopener">'+badge(x.channel,36)+'<span class="t">'+esc(x.title)+'</span></a>';}).join('')+'</div>';}
   return h+'</div>';}
 function gridCard(s){var a=s.src[0];
   return'<button class="card" data-act="story" data-id="'+esc(s.id)+'">'+pic(s,'ph43')+
@@ -411,17 +415,22 @@ function viewStory(id){
   return h+s.src.map(function(x,i){
     return'<button class="card pad" style="margin-bottom:12px" data-act="article" data-id="'+esc(s.id)+'" data-i="'+i+'"><div class="row" style="align-items:center;gap:8px">'+badge(x.channel,28)+'<span class="grow chn">'+chName(x.channel)+'</span><span class="meta">'+timeAgo(x.published)+'</span></div><div class="hl" style="font-size:18px;margin-top:6px">'+esc(x.title)+'</div></button>';
   }).join('');}
+var EXT='<svg aria-hidden="true" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4H4v12h12v-4M11 3h6v6M17 3l-8 8"/></svg>';
 function viewArticle(id,i){
-  var s=byId(id);if(!s)return BACK+'<p class="muted">މި ޚަބަރު ނުފެނުނު.</p>';
+  var s=byId(id);if(!s)return'<div class="topbar">'+BACK+'</div><p class="muted">މި ޚަބަރު ނުފެނުނު.</p>';
   var x=s.src[i]||s.src[0],liked=!!st.liked[id],saved=!!st.saved[id],cs=st.comments[id]||[];
-  var ph=x.image?{tint:s.tint,img:x.image}:s;
-  var h='<div class="row" style="justify-content:space-between">'+BACK+
+  var text=x.body||x.summary||'';
+  var h='<div class="topbar">'+BACK+
   '<button class="circle" data-act="save" data-id="'+esc(id)+'" aria-label="ރައްކާކުރޭ" aria-pressed="'+saved+'" style="color:'+(saved?'var(--accent)':'var(--text)')+'"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="'+(saved?'currentColor':'none')+'" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M5 3h10v14l-5-3.5L5 17z"/></svg></button></div>'+
-  '<div class="row" style="align-items:center;gap:10px;margin:16px 0 12px">'+badge(x.channel,40)+'<div style="line-height:1.5"><div class="mast" style="font-size:20px">'+chName(x.channel)+'</div><div class="meta">މަސްދަރު · '+timeAgo(x.published)+'</div></div></div>'+
-  '<h1 class="hl" style="font-size:28px;margin:0 0 16px">'+esc(x.title)+'</h1>'+photo(ph,220,20)+
-  (x.summary?'<p class="body">'+esc(x.summary)+'</p>':'<div style="height:16px"></div>')+
-  '<a class="send" href="'+esc(x.url)+'" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;text-decoration:none;margin-bottom:20px">މުޅި ޚަބަރު '+chName(x.channel)+' އިން ކިޔާލައްވާ</a>'+
-  '<div class="bar"><button class="like'+(liked?' on':'')+'" data-act="like" data-id="'+esc(id)+'" aria-pressed="'+liked+'"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="'+(liked?'currentColor':'none')+'" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M10 17s-6.5-3.9-6.5-8.6A3.6 3.6 0 0 1 10 6.2a3.6 3.6 0 0 1 6.5 2.2C16.5 13.1 10 17 10 17z"/></svg><span>ލައިކް '+(liked?1:0)+'</span></button>'+
+  '<div class="row" style="align-items:center;gap:10px;margin:18px 0 10px">'+badge(x.channel,40)+'<div style="line-height:1.5"><div class="chn" style="font-size:18px">'+chName(x.channel)+'</div><div class="meta" style="font-size:13px">'+timeAgo(x.published)+'</div></div></div>'+
+  '<h1 class="hl" style="font-size:27px;margin:0 0 14px">'+esc(x.title)+'</h1>'+pic(s,'ph43',x.image)+'<div style="height:4px"></div>';
+  h+=text?text.split(/\n\n+/).map(function(p){return'<p class="body">'+esc(p)+'</p>';}).join(''):'<p class="muted" style="margin:16px 0">މި ޚަބަރުގެ ލިޔުން އަދި ނުލިބޭ.</p>';
+  if(!x.full)h+='<a class="readon" href="'+esc(x.url)+'" target="_blank" rel="noopener">ބާކީ ބައި '+chName(x.channel)+' އިން ކިޔާލައްވާ '+EXT+'</a>';
+  else h+='<a class="srclink" href="'+esc(x.url)+'" target="_blank" rel="noopener">މަސްދަރު: '+chName(x.channel)+' '+EXT+'</a>';
+  var others=s.src.filter(function(y,j){return j!==(s.src[i]?i:0);});
+  if(others.length){h+='<h2 class="mast" style="font-size:24px;margin:28px 0 10px">މި ޚަބަރު ގެނެސްދިން އެހެން ޗެނަލްތައް</h2><div class="group">'+others.map(function(y){
+    return'<a class="cov" href="'+esc(y.url)+'" target="_blank" rel="noopener">'+badge(y.channel,36)+'<span class="grow" style="line-height:1.5"><span class="chn" style="display:block">'+chName(y.channel)+' <span class="meta" style="font-size:13px;font-weight:400">· '+timeAgo(y.published)+'</span></span><span class="t">'+esc(y.title)+'</span></span><span class="muted">'+EXT+'</span></a>';}).join('')+'</div>';}
+  h+='<div class="bar" style="margin-top:24px"><button class="like'+(liked?' on':'')+'" data-act="like" data-id="'+esc(id)+'" aria-pressed="'+liked+'"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="'+(liked?'currentColor':'none')+'" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M10 17s-6.5-3.9-6.5-8.6A3.6 3.6 0 0 1 10 6.2a3.6 3.6 0 0 1 6.5 2.2C16.5 13.1 10 17 10 17z"/></svg><span>ލައިކް '+(liked?1:0)+'</span></button>'+
   '<span class="muted" style="font-size:15px">'+cs.length+' ކޮމެންޓް</span></div>'+
   '<h2 class="mast" style="font-size:22px;margin:16px 0 8px">ކޮމެންޓްތައް</h2>';
   if(!cs.length)h+='<p class="muted" style="font-size:14px">އަދި ކޮމެންޓެއް ނެތް. ފުރަތަމަ ކޮމެންޓް ކުރައްވާ.</p>';
@@ -453,7 +462,7 @@ function onAct(e){
   else if(act==='col'){st.col=st.col||{};st.col[id]=!st.col[id];render(true);}
   else if(act==='sec'||act==='chan'||act==='list'){if(this===side)st.stack=[];push({v:act,id:id});}
   else if(act==='tab'){st.tab=id;st.stack=[];render();}
-  else if(act==='story'){var s=byId(id);if(!s)return;if(s.src.length===1){st.read[id]=true;persist();push({v:'article',id:id,i:0});}else push({v:'story',id:id});}
+  else if(act==='story'){if(!byId(id))return;st.read[id]=true;persist();push({v:'article',id:id,i:0});}
   else if(act==='article'){st.read[id]=true;persist();push({v:'article',id:id,i:+b.getAttribute('data-i')});}
   else if(act==='follow'){st.unfollowed[id]=!st.unfollowed[id];persist();rebuild();render(true);}
   else if(act==='like'){st.liked[id]=!st.liked[id];persist();render(true);}
