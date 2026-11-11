@@ -11,9 +11,9 @@
 <style>
 /* Thaana glyphs sit small in their em box with very tall built-in leading:
    scale them up and override the line metrics so sizes match Latin UI sizes. */
-@font-face{font-family:'MV Faseyha';src:url('fonts/MVFaseyha-Regular.ttf') format('truetype');font-weight:400;font-display:swap;size-adjust:132%;ascent-override:78%;descent-override:42%;line-gap-override:0%}
-@font-face{font-family:'MV Faseyha';src:url('fonts/MVFaseyha-Bold.ttf') format('truetype');font-weight:700;font-display:swap;size-adjust:132%;ascent-override:78%;descent-override:42%;line-gap-override:0%}
-@font-face{font-family:'MV AammuFK';src:url('fonts/MVAammuFK.ttf') format('truetype');font-weight:400 800;font-display:swap;size-adjust:112%;ascent-override:80%;descent-override:36%;line-gap-override:0%}
+@font-face{font-family:'MV Faseyha';src:url('fonts/MVFaseyha-Regular.ttf') format('truetype');font-weight:400;font-display:swap;size-adjust:132%;ascent-override:83%;descent-override:29%;line-gap-override:0%}
+@font-face{font-family:'MV Faseyha';src:url('fonts/MVFaseyha-Bold.ttf') format('truetype');font-weight:700;font-display:swap;size-adjust:132%;ascent-override:83%;descent-override:29%;line-gap-override:0%}
+@font-face{font-family:'MV AammuFK';src:url('fonts/MVAammuFK.ttf') format('truetype');font-weight:400 800;font-display:swap;size-adjust:112%;ascent-override:89%;descent-override:28%;line-gap-override:0%}
 :root{
 --bg:#F2F2F7;--card:#FFFFFF;--raised:#EFEFF4;--line:#E5E5EA;--text:#000;--soft:#3C3C43;--muted:#8E8E93;--accent:#FF375F;
 --green:#5DBB7E;--orange:#F39A37;--nav:rgba(246,246,248,.78);--navline:rgba(0,0,0,.06);--navon:rgba(0,0,0,.07);--shadow:0 10px 30px rgba(0,0,0,.12);--photo:#D9D9DE;--strip:#EBEBF0;
@@ -196,9 +196,9 @@ nav button svg{width:24px;height:24px}
 .trow .meta{white-space:normal}
 .trow .foot{align-items:flex-start;gap:8px}
 /* ---- Clean variant: upright sans Thaana (add ?font=clean to the address) ---- */
-@font-face{font-family:'Noto Thaana';src:url('fonts/NotoSansThaana-400.woff2') format('woff2');font-weight:400;font-display:swap;size-adjust:140%;ascent-override:72%;descent-override:34%;line-gap-override:0%}
-@font-face{font-family:'Noto Thaana';src:url('fonts/NotoSansThaana-700.woff2') format('woff2');font-weight:700;font-display:swap;size-adjust:140%;ascent-override:72%;descent-override:34%;line-gap-override:0%}
-@font-face{font-family:'Noto Thaana';src:url('fonts/NotoSansThaana-800.woff2') format('woff2');font-weight:800;font-display:swap;size-adjust:140%;ascent-override:72%;descent-override:34%;line-gap-override:0%}
+@font-face{font-family:'Noto Thaana';src:url('fonts/NotoSansThaana-400.woff2') format('woff2');font-weight:400;font-display:swap;size-adjust:140%;ascent-override:81%;descent-override:26%;line-gap-override:0%}
+@font-face{font-family:'Noto Thaana';src:url('fonts/NotoSansThaana-700.woff2') format('woff2');font-weight:700;font-display:swap;size-adjust:140%;ascent-override:81%;descent-override:26%;line-gap-override:0%}
+@font-face{font-family:'Noto Thaana';src:url('fonts/NotoSansThaana-800.woff2') format('woff2');font-weight:800;font-display:swap;size-adjust:140%;ascent-override:81%;descent-override:26%;line-gap-override:0%}
 html.clean{--f-mast:'Noto Thaana',-apple-system,'Helvetica Neue',Arial,sans-serif;--f-head:var(--f-mast);--f-ui:var(--f-mast);--f-body:var(--f-mast)}
 html.clean .mast{font-weight:800;letter-spacing:-.01em}
 html.clean .hl{-webkit-text-stroke:0;font-weight:700;line-height:1.7;word-spacing:0}
@@ -260,6 +260,10 @@ h2.mast{margin-top:22px}
   .pill{height:22px;line-height:22px;padding:0 9px;border-radius:11px;font-size:11px}
   .foot{min-height:22px}.dots{height:22px}
 }
+/* lower vowel signs reach below the (now optically centred) line box: keep them from being clipped */
+.card .hl,.trow .hl,.mrow span.t,.cov .t{padding-bottom:.22em}
+.hl{line-height:1.68}
+.m1,.m2{line-height:1.38}.masthead .m2{margin-top:0}
 </style>
 </head>
 <body>
