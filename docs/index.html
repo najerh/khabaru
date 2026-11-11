@@ -53,6 +53,7 @@ h2.mast{font-size:28px;margin:34px 0 10px;line-height:1.3}
 .phsq{width:120px;height:120px;flex:none;border-radius:10px}
 .pad{padding:12px 14px 8px}
 .chn{font-family:var(--f-head);font-weight:700;font-size:15px;color:var(--text);line-height:1.5}
+.chl{display:flex;align-items:center;gap:8px}
 .hl{font-family:var(--f-head);font-weight:700;line-height:1.45;margin:2px 0 0;overflow-wrap:anywhere}
 .card .hl,.trow .hl{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 .pill{display:inline-flex;align-items:center;height:34px;padding:0 14px;border-radius:17px;background:var(--raised);font-size:14px;color:var(--text)}
@@ -70,7 +71,8 @@ h2.mast{font-size:28px;margin:34px 0 10px;line-height:1.3}
 .more h3{margin:0 0 4px;font-family:var(--f-ui);font-size:17px;font-weight:700}
 .mrow{color:inherit;text-decoration:none;display:flex;align-items:center;gap:12px;width:100%;min-height:52px;padding:6px 0;text-align:right}
 .mrow span.t{font-size:16px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.badge{flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;line-height:1}
+.badge{position:relative;overflow:hidden;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;line-height:1}
+.badge img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#fff}
 .promo{display:flex;align-items:stretch;width:100%;height:56px;border-radius:14px;overflow:hidden;background:var(--card);margin:12px 0 0;text-align:right}
 .promo .tx{flex:1 1 0;padding:6px 14px;line-height:1.4;display:flex;flex-direction:column;justify-content:center}
 .promo .tx b{font-family:var(--f-ui);font-weight:700;font-size:17px}
@@ -237,7 +239,7 @@ function load(){
   data.loading=true;render(true);
   if(!PROXY){useSample('');data.loading=false;render(true);return;}
   fetch('feeds.json?t='+Date.now()).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}).then(function(j){
-    data.sample=false;data.error='';data.fetchedAt=j.fetchedAt;data.status={};(j.channels||[]).forEach(function(c){data.status[c.id]=c.status;});
+    data.sample=false;data.error='';data.fetchedAt=j.fetchedAt;data.status={};data.logos={};(j.channels||[]).forEach(function(c){data.status[c.id]=c.status;if(c.logo)data.logos[c.id]=c.logo;});
     data.articles=j.articles||[];if(!data.articles.length)throw new Error('empty');rebuild();
   }).catch(function(e){useSample('ޚަބަރު ނުގެނެވުނު ('+e.message+'). ނަމޫނާ ދައްކަނީ.');}).then(function(){data.loading=false;render(true);});
 }
@@ -248,7 +250,8 @@ function secName(id){for(var i=0;i<SECS.length;i++)if(SECS[i].id===id)return SEC
 function byId(id){for(var i=0;i<data.stories.length;i++)if(data.stories[i].id===id)return data.stories[i];return null;}
 function timeAgo(iso){var d=(Date.now()-Date.parse(iso))/60000;if(d<1)return'މިހާރު';if(d<60)return Math.floor(d)+' މިނެޓު ކުރިން';if(d<1440)return Math.floor(d/60)+' ގަޑިއިރު ކުރިން';return Math.floor(d/1440)+' ދުވަސް ކުރިން';}
 function cov(s){return s.src.length+' ޗެނަލުގެ ކަވަރޭޖް';}
-function badge(ch,size){var c=CH[ch]||{ini:'?',color:'#555'};return'<span class="badge" style="width:'+size+'px;height:'+size+'px;border-radius:'+Math.round(size*.22)+'px;background:'+c.color+';font-size:'+Math.round(size*.36)+'px">'+esc(c.ini)+'</span>';}
+function badge(ch,size){var c=CH[ch]||{ini:'?',color:'#555'},lg=data.logos&&data.logos[ch];return'<span class="badge" style="width:'+size+'px;height:'+size+'px;border-radius:'+Math.round(size*.22)+'px;background:'+c.color+';font-size:'+Math.round(size*.36)+'px">'+esc(c.ini)+(lg?'<img src="'+esc(lg)+'" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">':'')+'</span>';}
+function chLine(ch){return'<div class="chn chl">'+badge(ch,22)+'<span>'+chName(ch)+'</span></div>';}
 function chName(ch){return esc((CH[ch]||{name:ch}).name);}
 function photo(s,h,r,w){
   var box='style="height:'+h+'px;'+(w?'width:'+w+'px;flex:none;':'')+'border-radius:'+(r||0)+'px;background:'+s.tint+'"';
@@ -314,7 +317,7 @@ function sideHtml(){
   h+=label('lib','ލައިބްރަރީ');
   if(!st.col.lib){h+=item('list','saved',t.v==='list'&&t.id==='saved',ico('M6 3h12v18l-6-4.5L6 21z',1),'ރައްކާކުރި ޚަބަރު')+item('list','read',t.v==='list'&&t.id==='read',ico('M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5.5H8',0),'ކިޔުނު ޚަބަރު');}
   h+=label('ch','ޗެނަލްތައް');
-  if(!st.col.ch)h+=Object.keys(CH).filter(function(k){return !st.unfollowed[k];}).map(function(k){return item('chan',k,t.v==='chan'&&t.id===k,'<span class="sq" style="background:'+CH[k].color+';color:#fff;font-size:11px">'+esc(CH[k].ini)+'</span>',chName(k));}).join('');
+  if(!st.col.ch)h+=Object.keys(CH).filter(function(k){return !st.unfollowed[k];}).map(function(k){return item('chan',k,t.v==='chan'&&t.id===k,badge(k,26),chName(k));}).join('');
   h+=label('sec','ބައިތައް');
   if(!st.col.sec)h+=SECS.map(function(x){return item('sec',x.id,t.v==='sec'&&t.id===x.id,'<span class="sq" style="background:var(--raised)">'+glyph(x.id,18,2.2)+'</span>',x.name);}).join('');
   return h;}
@@ -372,7 +375,7 @@ function viewFollowing(){
   if(!st.col.ch){
     var keys=Object.keys(CH).filter(function(k){return ed||!st.unfollowed[k];});
     h+=keys.length?'<div class="group">'+keys.map(function(k){var on=!st.unfollowed[k];
-      var sq='<span class="sq" style="background:'+CH[k].color+';color:#fff;font-size:12px">'+esc(CH[k].ini)+'</span>';
+      var sq=badge(k,30);
       if(ed)return'<div>'+sq+'<span class="grow" style="line-height:1.4"><span style="font-size:17px;display:block">'+chName(k)+'</span><span class="meta" style="font-size:13px">'+statusText(k)+'</span></span><button class="follow'+(on?' on':'')+'" data-act="follow" data-id="'+k+'" aria-pressed="'+on+'">'+(on?'ފޮލޯކުރަނީ':'ފޮލޯ')+'</button></div>';
       return'<button data-act="chan" data-id="'+k+'">'+sq+'<span class="grow" style="font-size:17px">'+chName(k)+'</span>'+CHEV+'</button>';}).join('')+'</div>':'<p class="muted" style="padding:0 16px">އެއްވެސް ޗެނަލެއް ފޮލޯއެއް ނުކުރޭ.</p>';}
   h+=glabel('sec','ބައިތައް');
