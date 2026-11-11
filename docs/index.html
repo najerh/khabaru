@@ -30,7 +30,7 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-famil
 button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0;text-align:right;-webkit-tap-highlight-color:transparent}
 button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 button:active{opacity:.7}
-#app{max-width:480px;margin:0 auto;min-height:100%;padding:20px 16px 130px}
+#app{max-width:none;margin:0 auto;min-height:100%;padding:16px 16px 130px}
 .mast{font-family:var(--f-mast);font-weight:400;line-height:1.35;margin:0}
 .m1{font-size:36px;line-height:1.05}.m2{font-size:34px;line-height:1.05;color:var(--muted);margin-top:4px}
 .masthead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
@@ -208,6 +208,33 @@ html.clean .m1,html.clean .m2{line-height:1.45}
 html.clean h2.mast{line-height:1.6}
 html.clean .ftile,html.clean .tile,html.clean .rank{font-weight:700}
 html.clean .cta,html.clean .wide,html.clean .s-item.on{font-weight:700}
+/* ---- Split view / iPad portrait (600-999px): fill the pane like Apple News does ---- */
+@media (min-width:520px) and (max-width:999px){
+  #app{padding:14px 14px 120px}
+  .m1{font-size:28px;line-height:1.3}.m2{font-size:28px;line-height:1.3}
+  h2.mast{font-size:23px;margin:22px 0 8px}
+  .chips{margin-top:12px}
+  .chip{height:28px;line-height:28px;font-size:13px;padding:0 13px;border-radius:14px}
+  .cta{height:36px;font-size:14px;border-radius:18px}
+  .card .hl{font-size:16px!important}
+  .card>.ph43+.pad .hl,.card>.ph43~.pad .hl,.cardbtn .hl{font-size:18px!important}
+  .grid2 .card .hl{font-size:16px!important}
+  .pill{height:28px;font-size:12px;border-radius:14px}
+  .phsq{width:104px;height:104px}
+  .tiles{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .tiles2{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .promo,.wide{max-width:420px}
+  /* Apple's compact iPad bar: a short pill on one side, search as its own circle on the other */
+  nav{left:auto;right:16px;transform:none;width:auto;max-width:none;height:60px;border-radius:30px;padding:4px}
+  nav button{flex:none;width:78px;border-radius:26px}
+  nav button[data-tab=search]{position:absolute;left:calc(100% + 32px - 100vw);bottom:-1px;width:60px;height:60px;border-radius:30px;border:1px solid var(--navline);background:var(--nav);-webkit-backdrop-filter:blur(24px) saturate(1.4);backdrop-filter:blur(24px) saturate(1.4);box-shadow:var(--shadow)}
+  nav button[data-tab=search] span{display:none}
+  nav button[data-tab=search].on{background:var(--nav)}
+  .body{font-size:18px}
+  #app.narrow{max-width:680px}
+}
+/* tighter headline leading everywhere */
+.hl{line-height:1.6}
 </style>
 </head>
 <body>
