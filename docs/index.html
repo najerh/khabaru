@@ -9,15 +9,16 @@
 <title>ޚަބަރު - Thaana News App</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thaana:wght@400;500;700;800&display=swap">
 <style>
-@font-face{font-family:'MV Randhoo';src:url('fonts/MVRandhoo.ttf') format('truetype');font-weight:400;font-display:swap}
+@font-face{font-family:'MV Faseyha';src:url('fonts/MVFaseyha-Regular.ttf') format('truetype');font-weight:400;font-display:swap}
+@font-face{font-family:'MV Faseyha';src:url('fonts/MVFaseyha-Bold.ttf') format('truetype');font-weight:700;font-display:swap}
 @font-face{font-family:'MV AammuFK';src:url('fonts/MVAammuFK.ttf') format('truetype');font-weight:400 800;font-display:swap}
 :root{
 --bg:#F2F2F7;--card:#FFFFFF;--raised:#EFEFF4;--line:#E5E5EA;--text:#000;--soft:#3C3C43;--muted:#8E8E93;--accent:#FF375F;
 --green:#5DBB7E;--orange:#F39A37;--nav:rgba(246,246,248,.78);--navline:rgba(0,0,0,.06);--navon:rgba(0,0,0,.07);--shadow:0 10px 30px rgba(0,0,0,.12);--photo:#D9D9DE;--strip:#EBEBF0;
 --f-mast:'MV AammuFK','Noto Sans Thaana',sans-serif;
---f-head:'MV AammuFK','Noto Sans Thaana',sans-serif;
---f-ui:'MV Randhoo','Noto Sans Thaana',sans-serif;
---f-body:'MV Randhoo','Noto Sans Thaana',sans-serif;
+--f-head:'MV Faseyha','Noto Sans Thaana',sans-serif;
+--f-ui:'MV Faseyha','Noto Sans Thaana',sans-serif;
+--f-body:'MV Faseyha','Noto Sans Thaana',sans-serif;
 }
 @media (prefers-color-scheme:dark){:root{
 --bg:#000;--card:#1C1C1E;--raised:#2C2C2E;--line:#38383A;--text:#fff;--soft:#C7C7CC;--muted:#8E8E93;--green:#5DBB7E;--orange:#F39A37;
@@ -29,7 +30,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 button:active{opacity:.7}
 #app{max-width:480px;margin:0 auto;min-height:100%;padding:20px 16px 130px}
 /* The title font has one weight; a hairline stroke brings it nearer Apple's bold. */
-.mast,.hl,.chn,.ftile,.tile,.rank{-webkit-text-stroke:.35px currentColor}
+.mast{-webkit-text-stroke:.35px currentColor}
 .mast{font-family:var(--f-mast);font-weight:400;line-height:1.35;margin:0}
 .m1{font-size:36px;line-height:1.05}.m2{font-size:34px;line-height:1.05;color:var(--muted);margin-top:4px}
 .masthead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
@@ -51,8 +52,8 @@ h2.mast{font-size:28px;margin:34px 0 10px;line-height:1.3}
 .ph43{width:100%;aspect-ratio:4/3}
 .phsq{width:120px;height:120px;flex:none;border-radius:10px}
 .pad{padding:12px 14px 8px}
-.chn{font-family:var(--f-mast);font-weight:400;font-size:15px;color:var(--text);line-height:1.5}
-.hl{font-family:var(--f-head);font-weight:400;line-height:1.45;margin:2px 0 0;overflow-wrap:anywhere}
+.chn{font-family:var(--f-head);font-weight:700;font-size:15px;color:var(--text);line-height:1.5}
+.hl{font-family:var(--f-head);font-weight:700;line-height:1.45;margin:2px 0 0;overflow-wrap:anywhere}
 .card .hl,.trow .hl{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 .pill{display:inline-flex;align-items:center;height:34px;padding:0 14px;border-radius:17px;background:var(--raised);font-size:14px;color:var(--text)}
 .foot{display:flex;align-items:center;justify-content:space-between;margin-top:10px;min-height:34px}
@@ -66,18 +67,18 @@ h2.mast{font-size:28px;margin:34px 0 10px;line-height:1.3}
 .grid2 .card{margin:0;display:flex;flex-direction:column}
 .grid2 .pad{flex:1 1 auto;display:flex;flex-direction:column}
 .more{margin:0 14px;padding:10px 0 6px;border-top:1px solid var(--line)}
-.more h3{margin:0 0 4px;font-family:var(--f-ui);font-size:17px;font-weight:400}
+.more h3{margin:0 0 4px;font-family:var(--f-ui);font-size:17px;font-weight:700}
 .mrow{display:flex;align-items:center;gap:12px;width:100%;min-height:52px;padding:6px 0;text-align:right}
 .mrow span.t{font-size:16px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .badge{flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;line-height:1}
 .promo{display:flex;align-items:stretch;width:100%;height:56px;border-radius:14px;overflow:hidden;background:var(--card);margin:12px 0 0;text-align:right}
 .promo .tx{flex:1 1 0;padding:6px 14px;line-height:1.4;display:flex;flex-direction:column;justify-content:center}
-.promo .tx b{font-family:var(--f-ui);font-weight:400;font-size:17px}
+.promo .tx b{font-family:var(--f-ui);font-weight:700;font-size:17px}
 .promo .tx span{font-size:13px;color:var(--soft)}
 .promo .art{width:76px;background:var(--accent);clip-path:polygon(0 0,100% 0,100% 100%,22% 100%);display:flex;align-items:center;justify-content:center;color:#fff;padding-inline-start:10px}
 [dir=rtl] .promo .art{clip-path:polygon(0 0,100% 0,78% 100%,0 100%);padding-inline-start:0;padding-inline-end:10px}
 .tiles2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.ftile{height:48px;border-radius:16px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--f-mast);font-size:17px;text-align:center;padding:0 10px;white-space:nowrap;overflow:hidden}
+.ftile{height:48px;border-radius:16px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--f-head);font-weight:700;font-size:17px;text-align:center;padding:0 10px;white-space:nowrap;overflow:hidden}
 .ftile.plain{background:var(--card);color:var(--text)}
 .wide{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:56px;margin-top:18px;border-radius:18px;background:var(--line);color:var(--accent);font-size:17px}
 .rank{width:44px;height:44px;flex:none;border-radius:22px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;font-family:var(--f-mast);margin-top:2px}
@@ -97,7 +98,7 @@ h2.mast{font-size:28px;margin:34px 0 10px;line-height:1.3}
 .search input,.cform input{flex:1 1 0;min-width:0;height:44px;border:0;background:none;color:var(--text);font:inherit;font-size:17px}
 input::placeholder{color:var(--muted)}
 .tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.tile{position:relative;height:98px;display:flex;align-items:flex-end;padding:8px 12px;border-radius:14px;color:#fff;font-family:var(--f-mast);font-size:18px;line-height:1.5;overflow:hidden}
+.tile{position:relative;height:98px;display:flex;align-items:flex-end;padding:8px 12px;border-radius:14px;color:#fff;font-family:var(--f-head);font-weight:700;font-size:18px;line-height:1.5;overflow:hidden}
 .tile svg{position:absolute;inset-inline-end:-6px;bottom:-10px;opacity:.28}
 .body{font-family:var(--f-body);font-size:18px;line-height:2.1;color:var(--soft);margin:16px 0}
 .bar{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
