@@ -235,6 +235,31 @@ html.clean .cta,html.clean .wide,html.clean .s-item.on{font-weight:700}
 }
 /* tighter headline leading everywhere */
 .hl{line-height:1.6}
+/* ---- Measured against Apple News: coverage pill, category chips, channel line ---- */
+.pill{height:24px;padding:0 10px;border-radius:12px;font-size:11.5px;font-weight:700;line-height:24px}
+.foot{min-height:24px;margin-top:8px}
+.dots{height:24px}
+.chl{gap:6px;margin:0 0 3px;line-height:1.3;align-items:center}
+.chl .badge{border-radius:4px}
+.chn{font-size:13.5px;line-height:1.3}
+.pad{padding:11px 14px 13px}
+.chips{gap:7px;margin-top:14px}
+.chip{height:33px;line-height:33px;padding:0 15px;border-radius:16.5px;font-size:15.5px}
+h2.mast{margin-top:22px}
+.masthead .m2{margin-top:-2px}
+@media (min-width:520px) and (max-width:999px){
+  .pill{height:22px;line-height:22px;padding:0 10px;border-radius:11px;font-size:11px}
+  .foot{min-height:21px;margin-top:6px}.dots{height:21px}
+  .chip{height:28px;line-height:28px;padding:0 12px;border-radius:14px;font-size:14px}
+  .chips{gap:7px;margin-top:10px}
+  h2.mast{margin-top:18px}
+  .chn{font-size:13px}
+  .pad{padding:10px 12px 12px}
+}
+@media (min-width:1000px){
+  .pill{height:22px;line-height:22px;padding:0 9px;border-radius:11px;font-size:11px}
+  .foot{min-height:22px}.dots{height:22px}
+}
 </style>
 </head>
 <body>
@@ -334,7 +359,7 @@ function byId(id){for(var i=0;i<data.stories.length;i++)if(data.stories[i].id===
 function timeAgo(iso){var d=(Date.now()-Date.parse(iso))/60000;if(d<1)return'މިހާރު';if(d<60)return Math.floor(d)+' މިނެޓު ކުރިން';if(d<1440)return Math.floor(d/60)+' ގަޑިއިރު ކުރިން';return Math.floor(d/1440)+' ދުވަސް ކުރިން';}
 function cov(s){return s.src.length+' ޗެނަލުގެ ކަވަރޭޖް';}
 function badge(ch,size){var c=CH[ch]||{ini:'?',color:'#555'},lg=data.logos&&data.logos[ch];return'<span class="badge" style="width:'+size+'px;height:'+size+'px;border-radius:'+Math.round(size*.22)+'px;background:'+c.color+';font-size:'+Math.round(size*.36)+'px">'+esc(c.ini)+(lg?'<img src="'+esc(lg)+'" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">':'')+'</span>';}
-function chLine(ch){return'<div class="chn chl">'+badge(ch,22)+'<span>'+chName(ch)+'</span></div>';}
+function chLine(ch){return'<div class="chn chl">'+badge(ch,16)+'<span>'+chName(ch)+'</span></div>';}
 function chName(ch){return esc((CH[ch]||{name:ch}).name);}
 function photo(s,h,r,w){
   var box='style="height:'+h+'px;'+(w?'width:'+w+'px;flex:none;':'')+'border-radius:'+(r||0)+'px;background:'+s.tint+'"';
