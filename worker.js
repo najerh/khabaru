@@ -135,6 +135,7 @@ async function scrapeSite(c) {
       body: clip(paras, c.fullText ? FULL_MAX : EXCERPT_MAX), full: !!c.fullText && paras.length > 0,
       published: Number.isNaN(ts) ? new Date().toISOString() : new Date(ts).toISOString(),
       hint: (meta.section + ' ' + p.url).toLowerCase(), image: meta.image || null,
+      guess: Number.isNaN(ts), // no real publish time found; the fetch script keeps the first-seen time
     };
   }));
   // A "headline" this long is a whole teaser block, not a title.

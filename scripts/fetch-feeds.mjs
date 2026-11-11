@@ -12,9 +12,11 @@ data.articles = data.articles.slice(0, 400);
 // Article text: reuse what the last run stored, fetch pages only for new articles.
 const prev = new Map();
 const prevLogo = new Map();
+const seen = new Map(); // url -> time first seen, for articles whose page gives no publish time
 try {
   const old = JSON.parse(fs.readFileSync('docs/feeds.json', 'utf8'));
   for (const a of old.articles) if (a.body || a.tried2) prev.set(a.url, a);
+  for (const a of old.articles) seen.set(a.url, a.published);
   for (const c of old.channels) if (c.logo) prevLogo.set(c.id, c.logo);
 } catch {}
 
@@ -35,6 +37,8 @@ await Promise.all(data.channels.map(async (ch) => {
   }
   try { ch.logo = new URL(best || '/favicon.ico', c.home).toString(); } catch { ch.logo = null; }
 }));
+for (const a of data.articles) if (a.guess && seen.has(a.url)) a.published = seen.get(a.url);
+data.articles.sort((a, b) => Date.parse(b.published) - Date.parse(a.published));
 const fullText = new Set(CHANNELS.filter((c) => c.fullText).map((c) => c.id));
 const todo = [];
 for (const a of data.articles) {
